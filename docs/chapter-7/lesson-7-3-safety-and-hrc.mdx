@@ -1,0 +1,120 @@
+---
+title: 7.3 - Safety & HRC
+sidebar_position: 3
+id: lesson-7-3-safety-and-hrc
+---
+
+import Admonition from '@theme/Admonition';
+
+# 7.3 - Safety & HRC (Human-Robot Collaboration)
+
+## What You'll Learn
+
+As robots move out of cages and into human environments, safety becomes paramount. This lesson delves into the crucial topics of robotic safety standards and the principles of Human-Robot Collaboration (HRC). You will understand how to design and operate robots that are not only effective but also safe and cooperative when interacting with people.
+
+## 1. Robotic Safety Standards
+
+Safety in robotics is not optional; it's a fundamental requirement, often mandated by law and industry standards. These standards provide guidelines for design, manufacturing, and operation to minimize risks.
+
+### a. Risk Assessment
+
+-   **Concept:** The foundational step in safety. It involves systematically identifying potential hazards associated with a robot, estimating the likelihood and severity of harm, and determining if risk reduction measures are needed.
+-   **Hazards:** Mechanical (crushing, cutting), Electrical (shock, fire), Thermal (burns), Noise, Ergonomic (repetitive strain).
+
+### b. Emergency Stops (E-Stops)
+
+-   **Purpose:** To bring a robot to a safe, controlled stop as quickly as possible in an emergency situation.
+-   **Characteristics:**
+    -   **Readily Accessible:** Clearly marked and easy to reach.
+    -   **Latching:** Once pressed, it stays engaged until manually reset.
+    -   **Redundancy:** Often involves multiple E-stops and independent safety circuits.
+    -   **Fail-Safe Design:** Should operate even if power to the control system is lost.
+
+### c. Common Industrial Safety Standards
+
+-   **ISO 10218 (Robots and Robotic Devices - Safety Requirements for Industrial Robots):**
+    -   **Part 1 (Robots):** Specifies requirements for the design and construction of industrial robots.
+    -   **Part 2 (Robot Systems and Integration):** Specifies requirements for the installation, operation, maintenance, and safeguarding of industrial robot systems.
+-   **ISO/TS 15066 (Collaborative Robots):**
+    -   A technical specification that supplements ISO 10218-1 and -2, specifically addressing collaborative industrial robot applications. It defines the principles of Human-Robot Collaboration.
+
+## 2. Human-Robot Collaboration (HRC)
+
+HRC refers to scenarios where humans and robots work together, often sharing a common workspace, to achieve a task. This requires specialized safety considerations beyond traditional caged industrial robots.
+
+### a. HRC Operating Modes (as per ISO/TS 15066)
+
+1.  **Safety-Rated Monitored Stop:** The robot stops when a human enters the collaborative workspace and can restart automatically when the human leaves.
+2.  **Hand Guiding:** The human directly guides the robot by physically moving it, often used for teaching or precise positioning.
+3.  **Speed and Separation Monitoring:** The robot's speed is reduced as a human approaches and stops completely if separation distances are breached.
+4.  **Power and Force Limiting:** The robot is designed such that contact forces and pressures are inherently limited to avoid injury to a human. This is often the most sophisticated and safest mode.
+
+### b. Principles for Safe HRC Design
+
+-   **Predictability:** Robots should move in predictable ways. Avoid sudden, erratic, or ambiguous motions.
+-   **Transparency:** The robot's intent and current state should be easily understandable by humans (e.g., through lights, displays, sounds).
+-   **Awareness:** Robots must continuously monitor their workspace for human presence and react appropriately.
+-   **Responsiveness:** Robots should respond quickly and safely to human commands or interventions.
+-   **Compliance:** Designing robots with some mechanical compliance (spring-like behavior) or impedance control to make physical contact safer.
+
+## 3. Fault Detection & Handling
+
+Even with the best design, faults can occur. A robust system needs to detect and handle these gracefully.
+
+### a. Sensors for Monitoring
+
+-   **Internal Sensors:** Monitor motor currents, joint temperatures, voltage levels, controller states.
+-   **External Safety Sensors:** Light curtains, safety laser scanners, pressure-sensitive mats, vision-based human detection systems.
+
+### b. Defining and Reacting to Error States
+
+-   **Error Taxonomy:** Clearly define different error levels (e.g., Warning, Minor Error, Critical Error) and the required robot response for each.
+-   **Safe State:** When an error occurs, the robot should transition to a defined safe state (e.g., motors disabled, brakes engaged, gripper opened).
+-   **Graceful Degradation:** In non-critical failures, can the robot continue operating with reduced functionality, or does it need to stop completely?
+
+### c. Software Watchdogs and Heartbeats
+
+-   **Watchdog Timers:** Hardware or software timers that, if not reset periodically, will trigger a system reset or safe shutdown, preventing the robot from getting stuck in an unresponsive state.
+-   **Heartbeats:** Nodes periodically publish a "heartbeat" message to indicate they are alive. A supervisor node can detect missing heartbeats and take action.
+
+## Hands-On (Discussion: Capstone Safety Plan)
+
+Let's consider the safety implications of our capstone mobile manipulator performing a pick-and-place task.
+
+### Step 1: Identify Potential Hazards
+
+-   **Mobile Base:** What if it collides with a human or another object? What if it tips over?
+-   **Manipulator Arm:** What if it strikes a human? What if it drops the object?
+-   **Grasping:** What if a human's hand is in the gripper's path?
+-   **Electrical:** Are there exposed wires? What if a battery short-circuits?
+
+### Step 2: Propose Safety Measures
+
+Based on the hazards, what safety measures would you implement for the simulated (and eventually real) capstone robot?
+
+-   **Software Safety:**
+    -   Collision detection in navigation (Nav2).
+    -   Joint limits for the arm.
+    -   Safe arm trajectories (collision-free).
+    -   Object detection to prevent grasping human hands.
+    -   Emergency stop logic in the behavior tree.
+-   **Hardware Safety (for a real robot):**
+    -   Physical E-stop button.
+    -   Safety enclosures (if not collaborative).
+    -   Safety sensors (e.g., LIDAR for human detection, force sensors in gripper).
+    -   Proper fusing and wiring for the power system.
+
+### Step 3: Define Emergency Procedures
+
+-   What happens if an E-stop is pressed?
+-   What is the robot's safe state if it detects an unknown object in its immediate path?
+
+<Admonition type="warning" title="Safety is a Continuous Process">
+  Safety is not a feature you add at the end; it must be designed into the system from the very beginning and continually re-evaluated throughout the robot's lifecycle.
+</Admonition>
+
+## Challenges
+
+1.  **Ethical Dilemmas in Safety:** Research the "Trolley Problem" in the context of autonomous vehicles. How do ethical frameworks like utilitarianism or deontology apply to robot decision-making in safety-critical situations?
+2.  **Safety Sensor Technologies:** Research advanced safety sensor technologies used in industrial robotics (e.g., safety laser scanners, pressure-sensitive floor mats, vision-based safety monitoring systems).
+3.  **Human Factors:** How do human factors (e.g., fatigue, distraction, over-reliance on automation) influence the design of safe human-robot collaborative systems?

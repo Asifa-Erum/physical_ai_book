@@ -1,0 +1,208 @@
+---
+title: 3.1 - Gazebo & Physics
+sidebar_position: 1
+id: lesson-3-1-gazebo-and-physics
+---
+
+import Admonition from '@theme/Admonition';
+
+# 3.1 - Gazebo & Physics
+
+## What You'll Learn
+
+This lesson introduces Gazebo, a powerful 3D robotics simulator. You will understand its role in modern robotics development, learn its fundamental concepts like worlds, models, and physics, and get hands-on experience by launching the simulator and interacting with basic simulated objects.
+
+## Introduction to Gazebo
+
+Developing and testing robots directly on physical hardware can be expensive, time-consuming, and even dangerous. **Gazebo** (now often referred to as **Ignition Gazebo** or **Gazebo Sim**) provides a virtual sandbox where you can:
+
+-   **Test Algorithms Safely:** Experiment with navigation, manipulation, and perception algorithms without risking damage to a physical robot or its surroundings.
+-   **Reduce Costs:** Avoid the expense of acquiring and maintaining complex hardware during the early development stages.
+-   **Accelerate Iteration:** Rapidly test changes to your robot's software or design without waiting for physical assembly or deployment.
+-   **Reproducibility:** Create identical test scenarios, which is crucial for benchmarking and debugging.
+
+## Key Concepts in Gazebo
+
+### 1. Worlds: Defining the Environment
+
+-   **Definition:** A Gazebo **world** describes the entire simulation environment, including static objects (walls, furniture), dynamic objects (other robots, moving obstacles), lighting, and environmental properties (gravity, air density).
+-   **Format:** Worlds are typically defined using the **SDF (Simulation Description Format)**, an XML-based language.
+
+### 2. Models: Representing Robots and Objects
+
+-   **Definition:** A Gazebo **model** represents a physical object within the world. This can be a robot, a table, a block, or anything else you want to simulate.
+-   **URDF vs. SDF:**
+    -   **URDF (Unified Robot Description Format):** Primarily used in ROS to describe the kinematic and dynamic properties of a single robot (its joints, links, sensors).
+    -   **SDF (Simulation Description Format):** A more general-purpose format that can describe entire worlds, multiple robots, and environmental elements. Gazebo's native format.
+    -   **Conversion:** URDF models can often be converted or embedded within SDF worlds.
+
+### 3. Physics Engine: Simulating Reality
+
+-   **Definition:** At its core, Gazebo has a **physics engine** (e.g., ODE, DART, Bullet, Simbody) that simulates real-world physical interactions.
+-   **Properties:** This engine handles:
+    -   **Gravity:** Objects fall and behave realistically.
+    -   **Collisions:** Objects interact physically when they touch.
+    -   **Friction:** Affects how objects slide or roll.
+    -   **Joints:** How robot parts are connected and move relative to each other.
+    -   **Forces & Torques:** How motors and external influences affect movement.
+
+### 4. Sensors: Perceiving the Virtual World
+
+-   **Definition:** Gazebo allows you to add **simulated sensors** to your robot models. These sensors mimic the behavior of real-world sensors.
+-   **Types:** Common simulated sensors include:
+    -   **Cameras:** Provide realistic image data.
+    -   **LIDAR/Depth Sensors:** Simulate distance measurements.
+    -   **IMUs (Inertial Measurement Units):** Provide orientation and acceleration data.
+    -   **Contact Sensors:** Detect collisions.
+-   **ROS 2 Integration:** These simulated sensors can publish data directly to ROS 2 topics, allowing your ROS 2 nodes to process simulated data just as they would real sensor data.
+
+## Hands-On: Launching Gazebo and Interacting with a Simple World
+
+Let's launch Gazebo and interact with a basic world.
+
+### Step 1: Install Gazebo
+
+If you installed ROS 2 Humble using the full desktop installation (which includes Gazebo), you might already have it. If not:
+
+```bash
+sudo apt update
+sudo apt install ros-humble-gazebo-ros-pkgs # Installs Gazebo and ROS 2 bridge packages
+```
+
+### Step 2: Source ROS 2
+
+Ensure your ROS 2 environment is sourced.
+
+```bash
+source /opt/ros/humble/setup.bash
+# If you put it in .bashrc, just open a new terminal
+```
+
+### Step 3: Launch an Empty Gazebo World
+
+```bash
+gazebo # This will launch the classic Gazebo GUI with an empty world
+# Or for Ignition Gazebo (Gazebo Sim):
+# ign gazebo # or gz sim
+```
+You should see an empty 3D world with a ground plane and a sun.
+
+### Step 4: Add a Simple Model
+
+In the Gazebo GUI, go to `Insert` (top left panel), then expand `Gazebo` (or `ignition-fuel`) and select a `Simple Pushed Box`. Drag and drop it into the world.
+
+### Step 5: Interact with the Model
+
+-   **Move:** Select the "Translate" tool (cube icon) in the left panel. Click and drag the box.
+-   **Rotate:** Select the "Rotate" tool (circular arrows).
+-   **Apply Force:** Use the "Force" tool to push the box around.
+-   **Gravity:** Watch it fall if you lift it high enough.
+
+### Step 6: Create and Launch a Custom World
+
+You can define your own simple world in an SDF file.
+
+1.  **Create a world file:**
+    ```bash
+    mkdir -p ~/gazebo_worlds
+    nano ~/gazebo_worlds/my_simple_world.sdf
+    ```
+2.  **Paste the following content:**
+
+    ```xml
+    <?xml version="1.0" ?>
+    <sdf version="1.6">
+      <world name="my_simple_world">
+        <gravity>0 0 -9.8</gravity>
+        <scene>
+          <ambient>0.4 0.4 0.4 1</ambient>
+          <background>0.7 0.7 0.7 1</background>
+          <shadows>true</shadows>
+        </scene>
+        <light type="directional" name="sun">
+          <cast_shadows>true</cast_shadows>
+          <pose>0 0 10 0 0 0</pose>
+          <diffuse>0.8 0.8 0.8 1</diffuse>
+          <specular>0.2 0.2 0.2 1</specular>
+          <attenuation>
+            <range>1000</range>
+            <constant>0.9</constant>
+            <linear>0.01</linear>
+            <quadratic>0.001</quadratic>
+          </attenation>
+          <direction>-0.5 0.1 -0.9</direction>
+        </light>
+        <model name="ground_plane">
+          <static>true</static>
+          <link name="link">
+            <collision name="collision">
+              <geometry>
+                <plane>
+                  <normal>0 0 1</normal>
+                  <size>100 100</size>
+                </plane>
+              </geometry>
+              <surface>
+                <friction>
+                  <ode>
+                    <mu>1.0</mu>
+                    <mu2>1.0</mu2>
+                  </ode>
+                </friction>
+              </surface>
+            </collision>
+            <visual name="visual">
+              <geometry>
+                <plane>
+                  <normal>0 0 1</normal>
+                  <size>100 100</size>
+                </plane>
+              </geometry>
+              <material>
+                <script>
+                  <uri>file://media/materials/scripts/gazebo.material</uri>
+                  <name>Gazebo/FlatBlack</name>
+                </script>
+              </material>
+            </visual>
+          </link>
+        </model>
+        <model name="simple_cube">
+          <pose>0 0 0.5 0 0 0</pose>
+          <link name="body">
+            <inertial><mass>1.0</mass></inertial>
+            <collision name="collision">
+              <geometry><box><size>1 1 1</size></box></geometry>
+            </collision>
+            <visual name="visual">
+              <geometry><box><size>1 1 1</size></box></geometry>
+              <material>
+                <script>
+                  <uri>file://media/materials/scripts/gazebo.material</uri>
+                  <name>Gazebo/Red</name>
+                </script>
+              </material>
+            </visual>
+          </link>
+        </model>
+      </world>
+    </sdf>
+    ```
+
+3.  **Launch your custom world:**
+    ```bash
+    gazebo --verbose ~/gazebo_worlds/my_simple_world.sdf
+    # Or for Ignition Gazebo:
+    # ign gazebo ~/gazebo_worlds/my_simple_world.sdf
+    ```
+    You should see a red cube on a black ground plane.
+
+## Gazebo and ROS 2 Integration
+
+Later in this course, we will explore `ros_gz_bridge`, a powerful tool that allows seamless communication between Gazebo simulations and your ROS 2 nodes. This enables your ROS 2 controllers to command simulated robots and your perception nodes to process simulated sensor data.
+
+## Challenges
+
+1.  **Add Another Model:** Modify `my_simple_world.sdf` to include another `simple_cube` at a different position and color.
+2.  **Explore the GUI:** Spend some time exploring the Gazebo GUI. Try out different tools, change camera angles, and inspect model properties.
+3.  **Search Fuel:** Explore `https://fuel.gazebosim.org/`. This is a repository for Gazebo models and worlds. Try to download and insert a model into your running Gazebo instance.

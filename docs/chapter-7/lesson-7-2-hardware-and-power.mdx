@@ -1,0 +1,131 @@
+---
+title: 7.2 - Hardware & Power
+sidebar_position: 2
+id: lesson-7-2-hardware-and-power
+---
+
+import Admonition from '@theme/Admonition';
+
+# 7.2 - Hardware & Power
+
+## What You'll Learn
+
+Moving from theoretical algorithms and simulated environments to physical robots requires a deep understanding of hardware components and robust power system design. This lesson will guide you through the practical considerations of selecting, integrating, and managing the physical building blocks of your Physical AI systems.
+
+## 1. Hardware Selection: The Physical Building Blocks
+
+The choice of hardware components directly impacts your robot's capabilities, performance, and cost.
+
+### a. Compute Platforms
+
+-   **Microcontrollers (MCUs):** (e.g., Arduino, ESP32, Raspberry Pi Pico) Low-power, real-time control, ideal for low-level tasks like motor control, sensor reading, and basic logic. Limited computational power.
+-   **Single-Board Computers (SBCs):** (e.g., Raspberry Pi 4/5, NVIDIA Jetson Nano/Orin) More powerful processors (CPU/GPU), run full Linux OS, capable of running ROS 2, vision algorithms, and even smaller AI models (Edge AI). Best for higher-level control and perception.
+-   **Industrial PCs/Workstations:** For complex, high-performance applications (e.g., advanced perception, real-time motion planning for complex manipulators).
+-   **FPGAs/ASICs:** For highly specialized, ultra-low-latency tasks, often in industrial or high-performance domains.
+
+### b. Sensors (Review and Practical Considerations)
+
+-   **Cameras:** (e.g., Intel RealSense, ZED, Webcams) Resolution, frame rate, global/rolling shutter, depth accuracy, field of view.
+-   **LIDAR:** (e.g., RPLIDAR, Velodyne) Range, number of channels, angular resolution, update rate, outdoor vs. indoor performance.
+-   **IMU:** (e.g., MPU-6050, BNO055) Accuracy, drift, update rate, sensor fusion capabilities (accelerometer, gyroscope, magnetometer).
+-   **Encoders:** Integrated into motors or standalone, provide feedback on motor rotation and robot odometry.
+-   **GPS/GNSS:** For outdoor global positioning. Accuracy depends on type (single-band, multi-band, RTK).
+
+### c. Actuators (Review and Practical Considerations)
+
+-   **Motors:**
+    -   **DC Motors:** Simple, continuous rotation. Require motor drivers (H-Bridge) and often encoders for speed/position control.
+    -   **Stepper Motors:** Precise angular control. Require stepper drivers.
+    -   **Servo Motors:** Precise angular position control. Often come with integrated controllers.
+-   **Motor Drivers:** Translate low-power control signals from the compute platform into higher-power signals to drive motors. Must match motor voltage and current requirements.
+-   **Grippers/End-Effectors:**
+    -   **Parallel Jaw:** For rigid objects.
+    -   **Soft Grippers:** For delicate or irregularly shaped objects.
+    -   **Vacuum Grippers:** For flat, smooth surfaces.
+
+### d. Communication Modules
+
+-   **Wireless:**
+    -   **Wi-Fi:** Common for local network connectivity.
+    -   **Bluetooth:** Short-range, low-power.
+    -   **4G/5G:** For remote operation over cellular networks.
+    -   **UWB (Ultra-Wideband):** For high-precision indoor localization.
+-   **Wired:**
+    -   **Ethernet:** High bandwidth, reliable.
+    -   **CAN Bus:** Robust, multi-master protocol for automotive and industrial control.
+    -   **Serial (UART, I2C, SPI):** Common for communication between MCUs and sensors.
+
+## 2. Power System Design: The Robot's Lifeblood
+
+A reliable and efficient power system is critical for any autonomous robot.
+
+### a. Batteries
+
+-   **Types:**
+    -   **LiPo (Lithium Polymer):** High energy density, lightweight, high discharge rates. Requires careful handling and charging.
+    -   **Li-ion (Lithium-ion):** Good energy density, safer than LiPo, commonly used in laptops/phones.
+    -   **NiMH (Nickel-Metal Hydride):** Lower energy density, safer, less prone to damage.
+-   **Capacity (mAh or Wh):** Determines how long the robot can operate.
+-   **Voltage (V):** Number of cells in series. Must match system requirements.
+-   **C-rating (for LiPo):** Indicates safe continuous discharge current (e.g., 20C on a 2000mAh battery means 40A continuous discharge).
+
+### b. Power Distribution and Regulation
+
+-   **Main Power Switch/Fuse:** Essential for safety and circuit protection.
+-   **Voltage Regulators:** Most components operate at specific voltages (e.g., 5V for Arduino, 3.3V for ESP32/Pico, 12V for motors). Batteries often supply a higher voltage, which must be stepped down.
+    -   **Buck Converters (Step-Down):** Efficiently reduce voltage.
+    -   **Boost Converters (Step-Up):** Increase voltage (less common for primary power).
+    -   **Linear Regulators:** Simple, but inefficient (dissipate excess voltage as heat).
+-   **Power Distribution Board (PDB):** Centralizes power connections, often includes fuses/resettable breakers.
+-   **EMI/EMC (Electromagnetic Interference/Compatibility):** Motors generate electrical noise that can interfere with sensors and microcontrollers. Proper shielding, filtering (capacitors), and grounding are crucial.
+
+### c. Power Consumption and Budgeting
+
+-   **Estimate Consumption:** Identify the current draw (Amps) of all components (compute, sensors, motors at idle and under load).
+-   **Calculate Battery Life:** `Battery_Capacity (Ah) / Total_Current_Draw (A) = Operating_Time (h)`.
+-   **Optimize:** Turn off unused sensors, put components into low-power states, use efficient algorithms.
+
+## 3. Component Integration: Bringing It All Together
+
+-   **Mechanical Mounting:** Securely attach all components to the robot chassis. Consider vibrations, accessibility for maintenance, and cable routing.
+-   **Cabling:** Use appropriate gauge wires. Ensure cables are neat, strain-relieved, and protected from moving parts or sharp edges. Separate power and signal lines where possible to reduce interference.
+-   **Thermal Management:** Processors and motor drivers generate heat. Ensure adequate ventilation, heatsinks, or fans to prevent overheating and performance degradation.
+
+## Hands-On (Conceptual/Component Selection for Physical Capstone)
+
+Let's imagine designing the hardware for a physical version of our capstone mobile manipulator.
+
+### Step 1: Define Capstone Hardware Needs
+
+-   **Mobile Base:** What type of drive system? (e.g., differential drive, mecanum wheels). What motors? What encoders?
+-   **Manipulator Arm:** What degrees of freedom (DoF)? What type of servos/motors? What kind of gripper?
+-   **Compute:** Which SBC (e.g., Raspberry Pi 5 or Jetson Orin Nano) to run ROS 2, perception, and control?
+-   **Sensors:** What real camera, LIDAR, IMU would you choose?
+-   **Communication:** Wi-Fi for local control?
+
+### Step 2: Power Budgeting Exercise
+
+Estimate the peak current draw for your chosen components:
+-   SBC: X Amps
+-   LIDAR: Y Amps
+-   Camera: Z Amps
+-   Motors (under load): M Amps (for mobile base) + N Amps (for arm)
+
+Based on this, what battery capacity (mAh) and voltage (V) would you need for a 2-hour operating time?
+
+### Step 3: Integration Challenges
+
+Discuss potential integration challenges:
+-   Mounting the arm on the mobile base.
+-   Routing cables cleanly from sensors/actuators to the SBC.
+-   Preventing motor noise from affecting sensor readings.
+
+<Admonition type="info" title="Modular Design">
+  When selecting hardware, prioritize modularity. Choose components that are well-documented, have existing ROS 2 drivers, and can be easily swapped out for upgrades or troubleshooting.
+</Admonition>
+
+## Challenges
+
+1.  **Motor Driver Selection:** Research different types of motor drivers (e.g., L298N, DRV8833, high-power motor controllers). How do you choose the right one for a given DC motor?
+2.  **ROS 2 Drivers:** How would you search for existing ROS 2 drivers for a specific camera or LIDAR sensor you might want to use? What if a driver doesn't exist?
+3.  **Battery Safety:** Research safe handling, charging, and storage procedures for LiPo batteries. Why are they considered more dangerous than other battery types if mishandled?

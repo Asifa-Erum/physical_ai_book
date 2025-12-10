@@ -1,0 +1,125 @@
+---
+title: 4.2 - Computer Vision
+sidebar_position: 2
+id: lesson-4-2-computer-vision
+---
+
+import Admonition from '@theme/Admonition';
+
+# 4.2 - Computer Vision
+
+## What You'll Learn
+
+Computer Vision (CV) is the field that enables computers to "see" and interpret digital images or videos. In robotics, CV is vital for tasks like object recognition, tracking, navigation, and human-robot interaction. This lesson covers fundamental CV concepts, from image basics to modern machine learning-based object detection.
+
+## 1. Image Basics
+
+Digital images are the primary input for computer vision algorithms. Understanding their fundamental structure is key.
+
+-   **Pixels:** The smallest unit of a digital image. Each pixel has a value representing its color or intensity.
+-   **Resolution:** The number of pixels an image contains (e.g., 640x480 pixels). Higher resolution means more detail but also more data to process.
+-   **Color Spaces:**
+    -   **RGB (Red, Green, Blue):** The most common color model. Each pixel is represented by three values (0-255) indicating the intensity of red, green, and blue light.
+    -   **Grayscale:** Each pixel is represented by a single intensity value (0-255, where 0 is black and 255 is white). Simpler to process.
+-   **Image Formats:** PNG, JPG, BMP (how pixels are stored and compressed).
+
+## 2. Image Processing Fundamentals
+
+Basic image processing techniques are often used as pre-processing steps before more complex AI algorithms.
+
+-   **Filtering:** Modifying pixel values based on their neighbors to achieve certain effects.
+    -   **Blurring (Smoothing):** Reduces noise and detail. Common filters include Gaussian blur, median blur.
+    -   **Edge Detection:** Highlights areas of significant intensity change. Popular algorithms: Sobel, Canny.
+-   **Thresholding:** Converting a grayscale image into a binary (black and white) image by setting a pixel to white if its value is above a certain threshold, and black otherwise.
+-   **Morphological Operations:** Operations that process images based on shapes.
+    -   **Erosion:** Shrinks foreground objects. Useful for removing small noise.
+    -   **Dilation:** Expands foreground objects. Useful for filling small holes or connecting broken parts.
+
+## 3. Object Detection: Finding Things in Images
+
+One of the most critical tasks in robotic perception is **object detection** – identifying the presence and location of specific objects within an image.
+
+### Traditional Methods (Briefly)
+
+-   **Feature-Based Matching:** Algorithms like SIFT (Scale-Invariant Feature Transform) and SURF (Speeded Up Robust Features) extract unique keypoints from images, allowing objects to be recognized even with changes in scale or rotation. Less common for real-time detection now.
+
+### Machine Learning-Based Methods (Modern Approach)
+
+Modern object detection heavily relies on Deep Learning, especially Convolutional Neural Networks (CNNs).
+
+-   **Convolutional Neural Networks (CNNs):** A type of neural network specifically designed to process image data. They automatically learn relevant features from raw pixels.
+-   **Common Architectures:**
+    -   **YOLO (You Only Look Once):** Known for its speed, performing object detection in a single pass.
+    -   **SSD (Single Shot Detector):** Another fast, single-pass detector.
+    -   **Faster R-CNN:** More accurate but generally slower.
+    -   **MobileNet/EfficientNet:** Optimized for mobile and edge devices, offering a balance of speed and accuracy.
+-   **Pre-trained Models:** Often, we don't train these models from scratch. Instead, we use **pre-trained models** that have been trained on massive datasets (like ImageNet or COCO) and then fine-tune them or use them directly for inference.
+-   **Synthetic Data for Training:** As discussed in Chapter 3, synthetic data from simulators like Isaac Sim is invaluable for training robust object detection models, providing perfect ground truth labels.
+
+## Hands-On: Basic Image Processing with OpenCV (Python)
+
+OpenCV (Open Source Computer Vision Library) is a powerful, open-source library for computer vision tasks. We'll use it in Python.
+
+### Step 1: Install OpenCV
+
+```bash
+pip install opencv-python
+```
+
+### Step 2: Basic Image Operations
+
+Create a Python script (`image_processor.py`) to load, display, convert to grayscale, and detect edges in an image. You'll need an image file (e.g., `test_image.jpg`) in the same directory.
+
+```python
+import cv2
+
+# Load an image from file
+image = cv2.imread('test_image.jpg')
+
+# Check if image was loaded successfully
+if image is None:
+    print("Error: Could not load image. Make sure 'test_image.jpg' exists.")
+else:
+    # Convert image to grayscale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Apply Gaussian blur to reduce noise for edge detection
+    blurred_image = cv2.GaussianBlur(gray_image, (5, 5), 0)
+
+    # Perform Canny edge detection
+    edges = cv2.Canny(blurred_image, 50, 150) # min_val, max_val for hysteresis thresholding
+
+    # Display the original, grayscale, and edge-detected images
+    cv2.imshow('Original Image', image)
+    cv2.imshow('Grayscale Image', gray_image)
+    cv2.imshow('Edge Detected Image', edges)
+
+    # Wait for a key press and then close all windows
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+```
+
+### Step 3: Run the Script
+
+```bash
+python image_processor.py
+```
+This will open three windows displaying the original, grayscale, and edge-detected versions of your image.
+
+## (Conceptual) Object Detection with ROS 2
+
+Integrating object detection into a ROS 2 robot typically involves:
+
+1.  **Camera Driver:** A ROS 2 node that publishes camera images to a ROS 2 topic (e.g., `/camera/image_raw`).
+2.  **Object Detection Node:** A separate ROS 2 node that subscribes to the image topic, runs an object detection model (e.g., a YOLO model wrapped in a `ros2_yolov5` package), and publishes results (e.g., bounding boxes, class labels) to another topic (e.g., `/detected_objects`).
+3.  **Visualization:** Using `rviz2` to overlay the detected bounding boxes on the camera image.
+
+<Admonition type="tip" title="Edge AI for Vision">
+  Running complex CNNs on resource-constrained robots often requires optimized models (like MobileNet, EfficientNet) and specialized hardware (like NVIDIA Jetson or Google Coral) for efficient inference. This is the domain of Edge AI (TinyML for Vision).
+</Admonition>
+
+## Challenges
+
+1.  **Color Thresholding:** Modify the `image_processor.py` script. Try to detect a specific color (e.g., red) in your image using color thresholding (e.g., convert to HSV color space and define a range for red).
+2.  **Object Tracking (Conceptual):** Research "object tracking" algorithms (e.g., Kalman Filter, deep SORT). How would tracking detected objects over time improve a robot's ability to interact with its environment?
+3.  **Real-Time Performance:** Consider a robot driving at 1 m/s. If its camera is processing images at 10 FPS and object detection takes 100ms per frame, what are the implications for avoiding fast-moving obstacles?

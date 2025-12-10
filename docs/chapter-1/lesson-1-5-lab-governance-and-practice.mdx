@@ -1,0 +1,81 @@
+---
+title: 1.5 - Lab Governance & Practice
+sidebar_position: 5
+id: lesson-1-5-lab-governance-and-practice
+---
+
+# 1.5 - Lab Governance & Practice
+
+## What You'll Learn
+
+Working with Physical AI often involves a blend of software development, electrical engineering, and mechanical assembly. This lesson focuses on establishing best practices for a safe, organized, and reproducible robotics development environment, whether you're in a professional lab, a university setting, or a home workshop.
+
+## Safety First: Protecting Yourself and Your Equipment
+
+Safety is paramount in robotics. Ignoring safety protocols can lead to injury, damage to expensive equipment, or even catastrophic failures.
+
+### 1. Electrical Safety
+
+-   **Power Supplies:** Always understand your power source. Use regulated power supplies with overcurrent protection. Never short-circuit power rails.
+-   **Voltage & Current:** Be aware of the voltage and current limits of your components. Incorrect wiring can lead to smoke, fire, or component damage.
+-   **Disconnect Power:** Always disconnect power before making any physical changes to your circuit or robot. "Hot-swapping" components can cause damage.
+-   **Capacitors:** Be cautious with charged capacitors, especially in high-power applications, as they can store significant energy even after power is removed.
+
+### 2. Mechanical Safety
+
+-   **Moving Parts:** Be acutely aware of your robot's moving parts (arms, wheels, grippers). They can exert significant force. Keep hands, hair, and loose clothing away from rotating machinery.
+-   **Pinch Points:** Identify areas where body parts could get pinched or crushed.
+-   **Unexpected Movement:** Robots, especially during development, can behave unexpectedly. Develop in a controlled environment, away from obstacles or people who are unaware of the robot's presence.
+-   **Emergency Stop (E-Stop):** Know how to quickly and safely disable your robot in an emergency. This might involve a physical button, a software command, or simply unplugging the main power.
+
+### 3. Personal Protective Equipment (PPE)
+
+-   **Eye Protection:** Always wear safety glasses when soldering, cutting, or working with any tools that could produce debris.
+-   **Gloves:** Use appropriate gloves when handling chemicals (e.g., solder flux) or sharp objects.
+-   **Ventilation:** Ensure good ventilation when soldering or using chemicals.
+
+## Lab Organization: Efficiency and Clarity
+
+A well-organized workspace enhances safety, reduces troubleshooting time, and improves overall efficiency.
+
+### 1. Workspace Management
+
+-   **Cleanliness:** Keep your workbench clear of clutter. A clear space reduces the chance of accidental short circuits or misplacing components.
+-   **Clear Paths:** If working with mobile robots, ensure clear paths for their movement and avoid tripping hazards.
+-   **Designated Areas:** Have specific areas for soldering, testing, coding, and component storage.
+
+### 2. Component and Tool Management
+
+-   **Label Everything:** Label wires, components, circuit boards, and connectors. You'll thank yourself later.
+-   **Categorize Components:** Store resistors, capacitors, LEDs, sensors, etc., in clearly labeled bins or drawers.
+-   **Tool Storage:** Keep tools clean, organized, and in their designated places. Never leave sharp or hot tools unattended.
+
+## Reproducible Development: Trustworthy Results
+
+Reproducibility ensures that your experiments can be rerun, your code can be deployed reliably, and your results can be verified by others.
+
+### 1. Version Control with Git & GitHub
+
+-   **Code:** Use Git for all code. Commit frequently with descriptive messages.
+-   **Configuration Files:** Version control not just your code, but also your configuration files (e.g., ROS launch files, Gazebo world definitions, Python environment files).
+-   **Experiment Logs:** Consider version controlling experiment logs or data processing scripts.
+
+### 2. Dependency Management
+
+-   **Operating System:** Document the exact OS version (e.g., Ubuntu 22.04 LTS).
+-   **ROS Version:** Specify the ROS 2 distribution (e.g., Humble Hawksbill).
+-   **Libraries:** Document all Python libraries (`pip freeze > requirements.txt`) and C++ dependencies.
+-   **Hardware:** Keep records of the specific hardware components (model numbers, revisions) used for each experiment.
+
+### 3. Containerization with Docker (Introduction)
+
+-   **What it is:** Docker allows you to package your application and all its dependencies into a standardized unit (a "container").
+-   **Why it's useful:** It ensures that your code runs exactly the same way across different machines, eliminating "it worked on my machine" problems. We will explore Docker in more detail in later chapters.
+
+### 4. Documentation
+
+-   **Experiment Logs:** Maintain detailed lab notebooks or digital logs for each experiment, including setup, parameters, observations, and results.
+-   **Code Comments:** Write clear and concise comments in your code.
+-   **System Diagrams:** Keep up-to-date diagrams of your robot's hardware and software architecture.
+
+By embracing these practices, you will create a robust, safe, and efficient environment for your Physical AI development journey.

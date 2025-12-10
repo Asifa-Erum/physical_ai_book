@@ -1,0 +1,66 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #3578e5;
+  --ifm-color-primary-dark: #316cce;
+  --ifm-color-primary-darker: #2f66c2;
+  --ifm-color-primary-darkest: #2754a0;
+  --ifm-color-primary-light: #3984fa;
+  --ifm-color-primary-lighter: #3b8afc;
+  --ifm-color-primary-lightest: #559efd;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-background-color: linear-gradient(to bottom, #f0f2f5, #e9ebee);
+  --ifm-font-color-base: #1c1e21;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #5893f5;
+  --ifm-color-primary-dark: #3f7de2;
+  --ifm-color-primary-darker: #3373dd;
+  --ifm-color-primary-darkest: #2360c4;
+  --ifm-color-primary-light: #71a9f8;
+  --ifm-color-primary-lighter: #80b3f9;
+  --ifm-color-primary-lightest: #a9cafa;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-background-color: linear-gradient(to bottom, #1c1e21, #16181b);
+  --ifm-font-color-base: #e4e6eb;
+}
+
+body {
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.button {
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/*
+  Final attempt to force a round logo. This targets the <img> tag directly,
+  forces it into a square, and then rounds it.
+*/
+.navbar__brand .navbar__logo {
+  width: 36px;  /* Set a fixed width */
+  height: 36px; /* Set a fixed height to ensure it's a square */
+  border-radius: 50%; /* Make it round */
+  object-fit: cover;  /* Make the image fill the space, cropping if necessary */
+}
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

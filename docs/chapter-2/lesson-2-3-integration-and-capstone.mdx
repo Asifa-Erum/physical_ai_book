@@ -1,0 +1,251 @@
+---
+title: 2.3 - Integration & Capstone
+sidebar_position: 3
+id: lesson-2-3-integration-and-capstone
+---
+
+import Admonition from '@theme/Admonition';
+
+# 2.3 - Integration & Capstone
+
+## What You'll Learn
+
+This lesson focuses on integrating multiple ROS 2 nodes and setting up a structured workspace for our capstone project. You will learn how to use ROS 2 launch files to orchestrate complex systems and how parameters provide dynamic configuration for your nodes. This brings us closer to building a fully functional robotic system.
+
+## 1. Integrating ROS 2 Components
+
+In real-world robotics, you'll rarely run just one node. A typical robot system might have nodes for:
+-   Sensor drivers (camera, LiDAR, IMU)
+-   Perception (object detection, SLAM)
+-   Navigation (path planning, local control)
+-   Manipulation (arm control, inverse kinematics)
+-   High-level autonomy (behavior trees, mission planning)
+
+All these nodes need to be started and configured correctly.
+
+## 2. ROS 2 Launch Files: Orchestrating Your System
+
+Launch files are the primary mechanism in ROS 2 for starting and managing multiple nodes, setting parameters, and defining an entire robot's software configuration. They replace manual `ros2 run` commands with a single, declarative script.
+
+### Launch File Structure (`.launch.py`)
+
+ROS 2 launch files are typically written in Python. They allow for complex logic, including conditional execution, loops, and integration with other tools.
+
+**Basic elements of a launch file:**
+
+-   **`Node`**: Defines a ROS 2 node to be started (package name, executable name, node name, parameters).
+-   **`ExecuteProcess`**: Runs a shell command.
+-   **`IncludeLaunchDescription`**: Includes another launch file.
+-   **`DeclareLaunchArgument`**: Defines arguments that can be passed to the launch file.
+-   **`GroupAction`**: Groups nodes/actions together.
+
+### Example Launch File
+
+Let's create a launch file to start both our `talker` and `listener` nodes from Lesson 2.2.
+
+```python
+# ~/ros2_ws/src/my_simple_robot/launch/my_robot_launch.py
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='my_simple_robot',
+            executable='talker',
+            name='simple_talker',
+            output='screen', # Show node output in console
+        ),
+        Node(
+            package='my_simple_robot',
+            executable='listener',
+            name='simple_listener',
+            output='screen',
+        )
+    ])
+```
+
+## 3. ROS 2 Parameters: Dynamic Configuration
+
+Parameters allow you to adjust node behavior without recompiling code. They are exposed by nodes and can be set at launch time or changed dynamically while a node is running.
+
+### Declaring and Using Parameters in a Node (Python Example)
+
+```python
+# my_simple_robot/my_simple_robot/parameter_node.py
+import rclpy
+from rclpy.node import Node
+from rcl_interfaces.msg import SetParametersResult
+from std_msgs.msg import String
+
+class ParameterNode(Node):
+
+    def __init__(self):
+        super().__init__('parameter_node')
+        # Declare a parameter with a default value
+        self.declare_parameter('my_parameter', 'default_value')
+        self.declare_parameter('publish_frequency', 1.0) # Frequency in Hz
+
+        # Create a publisher
+        self.publisher_ = self.create_publisher(String, 'parameter_topic', 10)
+        self.timer_ = self.create_timer(1.0 / self.get_parameter('publish_frequency').value, self.timer_callback)
+
+        # Add a callback for when parameters are changed
+        self.add_on_set_parameters_callback(self.parameter_callback)
+
+    def timer_callback(self):
+        param_value = self.get_parameter('my_parameter').get_parameter_value().string_value
+        msg = String()
+        msg.data = f"Parameter value: {param_value}, Count: {self.get_clock().now().nanoseconds}"
+        self.publisher_.publish(msg)
+        self.get_logger().info('Publishing: "%s"' % msg.data)
+
+    def parameter_callback(self, params):
+        for param in params:
+            if param.name == 'my_parameter':
+                self.get_logger().info(f"Parameter 'my_parameter' changed to: {param.value}")
+            elif param.name == 'publish_frequency':
+                new_freq = param.value
+                self.get_logger().info(f"Parameter 'publish_frequency' changed to: {new_freq}")
+                # Re-create timer with new frequency
+                self.timer_.cancel()
+                self.timer_ = self.create_timer(1.0 / new_freq, self.timer_callback)
+        return SetParametersResult(successful=True)
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ParameterNode()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+### Setting Parameters in a Launch File
+
+You can set parameters directly within your `.launch.py` file.
+
+```python
+# my_simple_robot/launch/parameter_launch.py
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='my_simple_robot',
+            executable='parameter_node',
+            name='my_parameter_node',
+            output='screen',
+            parameters=[
+                {'my_parameter': 'initial_value_from_launch'},
+                {'publish_frequency': 2.0} # Set frequency to 2 Hz
+            ]
+        )
+    ])
+```
+
+## Hands-On: Launching Nodes with Parameters
+
+Let's update our `my_simple_robot` package.
+
+### Step 1: Update `setup.py`
+
+Add the `launch` directory to your `setup.py` so ROS 2 can find your launch files.
+
+```python
+# ~/ros2_ws/src/my_simple_robot/setup.py
+from setuptools import find_packages, setup
+import os
+from glob import glob
+
+package_name = 'my_simple_robot'
+
+setup(
+    name=package_name,
+    version='0.0.0',
+    packages=find_packages(exclude=['test']),
+    data_files=[
+        ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/resource', ['my_simple_robot']),
+        # Add this line to include your launch files
+        (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy]'))),
+    ],
+    install_requires=['setuptools'],
+    zip_safe=True,
+    maintainer='your_name',
+    maintainer_email='your_email@example.com',
+    description='TODO: Package description',
+    license='TODO: License declaration',
+    tests_require=['pytest'],
+    entry_points={
+        'console_scripts': [
+            'talker = my_simple_robot.publisher_member_function:main',
+            'listener = my_simple_robot.subscriber_member_function:main',
+            'param_node = my_simple_robot.parameter_node:main', # Add this
+        ],
+    },
+)
+```
+
+### Step 2: Create `launch` Directory and Files
+
+```bash
+mkdir -p ~/ros2_ws/src/my_simple_robot/launch
+```
+Create `~/ros2_ws/src/my_simple_robot/launch/my_robot_launch.py` and `~/ros2_ws/src/my_simple_robot/launch/parameter_launch.py` as shown in the examples above.
+
+### Step 3: Create Parameter Node
+
+Create `~/ros2_ws/src/my_simple_robot/my_simple_robot/parameter_node.py` as shown in the example above.
+
+### Step 4: Build Your Package
+
+```bash
+cd ~/ros2_ws
+colcon build --packages-select my_simple_robot
+source install/setup.bash
+```
+
+### Step 5: Run the Launch Files
+
+**Terminal 1:** Launch the talker/listener
+```bash
+ros2 launch my_simple_robot my_robot_launch.py
+```
+You should see both the talker and listener running.
+
+**Terminal 2:** Launch the parameter node
+```bash
+ros2 launch my_simple_robot parameter_launch.py
+```
+You should see the parameter node publishing messages based on the launch file's parameters.
+Now, try to change the parameter dynamically:
+```bash
+ros2 param set /my_parameter_node my_parameter "new_value_runtime"
+ros2 param set /my_parameter_node publish_frequency 0.5
+```
+Observe the parameter node's output in Terminal 2. The parameter value and publish frequency should change dynamically.
+
+## Capstone Project: Initial Structure
+
+For our Capstone Project, we will create a dedicated ROS 2 package to house its components.
+
+### Step 1: Create Capstone Workspace (if not already done)
+
+Our previous `ros2_ws` will serve as the capstone workspace. Ensure you are in `~/ros2_ws`.
+
+### Step 2: Create Capstone Package
+
+```bash
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python robot_capstone --dependencies rclpy std_msgs geometry_msgs
+# We'll add more dependencies as needed in later chapters
+```
+This package will be where we integrate all the modules we develop throughout the textbook.
+
+---
+
+This concludes our deep dive into ROS 2 fundamentals and tools. You now have a solid understanding of how to build and orchestrate ROS 2 systems, which is foundational for our Physical AI endeavors.

@@ -1,0 +1,85 @@
+---
+title: 1.4 - Capstone Scope & Workflow
+sidebar_position: 4
+id: lesson-1-4-capstone-scope-and-workflow
+---
+
+# 1.4 - Capstone Scope & Workflow
+
+## What You'll Learn
+
+This lesson introduces the central capstone project that will serve as a unifying thread throughout the entire textbook. You will understand the project's ultimate goal, its modular breakdown, and the iterative workflow that will guide its development from foundational concepts to a complete simulated (and optionally physical) robot.
+
+## The Capstone Project: A Simulated Mobile Manipulator
+
+Our capstone project is to build the complete software stack for a **simulated mobile manipulator robot** capable of performing a basic pick-and-place task. This project will integrate concepts from every chapter, providing a practical context for your learning.
+
+### Project Goal
+
+Develop a ROS 2-based software system for a simulated robot to:
+
+1.  **Navigate** to a designated area.
+2.  **Perceive** a target object (e.g., a colored block).
+3.  **Plan and Execute** a grasping motion with its manipulator arm.
+4.  **Transport** the object to a new location.
+5.  **Place** the object accurately.
+
+### Core Components to be Developed
+
+-   **Digital Twin:** A fully defined robot model in a simulation environment (e.g., URDF, SDFormat).
+-   **ROS 2 Communication:** A network of ROS 2 nodes handling perception, planning, and control.
+-   **Perception Pipeline:** Using simulated camera/LIDAR data to identify and localize objects.
+-   **Planning & Control:** Algorithms for inverse kinematics, path planning, and joint control for the manipulator.
+-   **Autonomy Layer:** Decision-making logic (e.g., Behavior Trees) to sequence actions and handle contingencies.
+
+### Optional Extension: Sim-to-Real Deployment
+
+For those with access to physical hardware (e.g., a small mobile robot base and a robotic arm), the ultimate challenge will be to adapt and deploy the developed software stack from simulation to the real robot. This highlights the practical challenges and best practices for bridging the sim-to-real gap.
+
+## Iterative Development Workflow
+
+We will build the capstone project iteratively, adding complexity and functionality with each chapter. This mirrors real-world robotics development, where large projects are broken into manageable, testable components.
+
+### Phase 1: Foundational Setup (Chapters 1-2)
+
+-   **Goal:** Establish a stable development environment and master ROS 2 fundamentals.
+-   **Activities:** Set up Ubuntu/ROS 2, learn ROS 2 communication patterns, basic command-line tools.
+-   **Capstone Contribution:** Prepare the foundation for ROS 2 nodes and communication for the robot.
+
+### Phase 2: Simulation Environment (Chapter 3)
+
+-   **Goal:** Create and configure the robot's digital twin and its operating environment.
+-   **Activities:** Learn URDF/SDFormat, build a custom robot model in Gazebo, integrate simulated sensors.
+-   **Capstone Contribution:** A fully functional robot model and a test environment in Gazebo.
+
+### Phase 3: Core Robotics & Perception (Chapter 4)
+
+-   **Goal:** Enable the robot to understand its environment and locate objects.
+-   **Activities:** Explore computer vision techniques, SLAM, sensor fusion.
+-   **Capstone Contribution:** ROS 2 nodes for processing camera/LIDAR data and publishing object detections.
+
+### Phase 4: Autonomy Layer (Chapter 5)
+
+-   **Goal:** Implement the robot's decision-making and action sequencing.
+-   **Activities:** Study planning algorithms, navigation stacks, behavior trees, and LLM integration for high-level commands.
+-   **Capstone Contribution:** A behavior tree (or similar state machine) to orchestrate the pick-and-place task.
+
+### Phase 5: Multi-Agent & Fleet Integration (Chapter 6)
+
+-   **Goal:** (If applicable) Extend the system for multi-robot scenarios.
+-   **Activities:** Concepts of multi-agent communication, shared world models.
+-   **Capstone Contribution:** (Optional) Adapt the pick-and-place for collaboration between multiple agents or for shared map usage.
+
+### Phase 6: Deployment & Industrial Readiness (Chapter 7)
+
+-   **Goal:** Understand the challenges of real-world deployment and robust operation.
+-   **Activities:** Consider hardware choices, power management, safety, and resilience.
+-   **Capstone Contribution:** Refinements to the simulated system for robustness, and discussion of potential physical deployment.
+
+## Tools and Practices
+
+-   **Version Control (Git/GitHub):** Absolutely essential for managing your code.
+-   **Documentation (Docusaurus):** Document your project's components and decisions.
+-   **Testing in Simulation:** Iteratively develop and test each module in Gazebo before integrating.
+
+By following this structured approach, you will progressively build a complex Physical AI system, mastering each sub-domain along the way.

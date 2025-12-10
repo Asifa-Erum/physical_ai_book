@@ -1,0 +1,276 @@
+.container {
+  /* This container acts as an overlay for mobile and holds the fixed chat button */
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Align button and window to the right */
+}
+
+.chatButton {
+  background-color: #36454F; /* Darker charcoal */
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease-in-out, background-color 0.2s;
+  position: relative; /* To be positioned correctly relative to container */
+  z-index: 1001; /* Above the chatbot window initially */
+}
+
+.chatButton:hover {
+  transform: scale(1.05);
+  background-color: #2F3C43; /* Slightly lighter on hover */
+}
+
+.chatButton svg {
+  width: 32px;
+  height: 32px;
+  color: #fff;
+}
+
+.chatbotWindow {
+  position: fixed; /* Fixed position relative to the viewport */
+  bottom: 20px;
+  right: 20px;
+  width: 320px; /* Reduced width */
+  height: 500px; /* Reduced height */
+  background-color: #1a1a1a; /* Dark background for the chat window */
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 999; /* Below the chat button initially, but above general content */
+
+  /* Slide-in/out animation */
+  transform: translateX(100%); /* Start off-screen to the right */
+  opacity: 0;
+  pointer-events: none; /* Make it unclickable when hidden */
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.chatbotWindowOpen {
+  transform: translateX(0); /* Slide into view */
+  opacity: 1;
+  pointer-events: auto; /* Make it clickable when open */
+}
+
+.chatbotHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  background-color: #2a2a2a; /* Slightly lighter header background */
+  color: #f0f0f0;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0; /* Prevent header from shrinking */
+  position: relative; /* For absolute positioning of close button */
+}
+
+.chatbotHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #f0f0f0;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute; /* Absolute within chatbotHeader */
+  top: 10px;
+  right: 10px;
+  z-index: 9999; /* Very high z-index for visibility */
+}
+
+.closeButton svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+}
+
+.closeButton:hover {
+  opacity: 1;
+}
+
+.messagesContainer {
+  flex-grow: 1; /* Take up available space */
+  padding: 1rem;
+  overflow-y: auto; /* Scrollable messages */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.messagesContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.message {
+  max-width: 80%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.user {
+  background-color: #28a745; /* Green for user messages */
+  color: #fff;
+  align-self: flex-end; /* Align user messages to the right */
+  border-bottom-right-radius: 5px; /* Slightly less rounded corner for the bottom right */
+}
+
+.bot {
+  background-color: #363636; /* Dark grey for bot messages */
+  color: #fff;
+  align-self: flex-start; /* Align bot messages to the left */
+  border-bottom-left-radius: 5px; /* Slightly less rounded corner for the bottom left */
+}
+
+.inputContainer {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid #333;
+  background-color: #2a2a2a; /* Same as header for consistency */
+  flex-shrink: 0; /* Prevent input from shrinking */
+}
+
+.inputField {
+  flex-grow: 1;
+  padding: 0.7rem;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background-color: #363636;
+  color: #fff;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+  outline: none;
+}
+
+.inputField::placeholder {
+  color: #bbb;
+}
+
+.inputField:focus {
+  border-color: #007bff;
+}
+
+.sendButton {
+  background-color: #007bff; /* Blue send button */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sendButton:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.sendButton svg {
+  width: 20px;
+  height: 20px;
+  fill: none; /* Ensure no fill */
+  stroke: currentColor;
+}
+
+.loadingDots {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  height: 10px;
+  text-align: center;
+}
+
+.loadingDots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin: 0 2px;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loadingDots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loadingDots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7); /* Overlay background when open */
+    border-radius: 0;
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container:not(.chatbotWindowOpen) {
+    display: none; /* Hide the container completely when chatbot is closed on mobile */
+  }
+
+  .chatButton {
+    /* Hide the trigger button when chatbot is open in full screen mobile */
+    display: none;
+  }
+
+  .chatbotWindow {
+    width: 90vw; /* Adjusted for mobile */
+    height: 80vh; /* Adjusted for mobile */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the window */
+    border-radius: 12px; /* Maintain some rounded corners */
+  }
+
+  .closeButton {
+    top: 15px; /* Adjust padding for mobile */
+    right: 15px;
+  }
+}

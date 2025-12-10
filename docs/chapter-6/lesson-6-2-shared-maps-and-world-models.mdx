@@ -1,0 +1,124 @@
+---
+title: 6.2 - Shared Maps & World Models
+sidebar_position: 2
+id: lesson-6-2-shared-maps-and-world-models
+---
+
+import Admonition from '@theme/Admonition';
+
+# 6.2 - Shared Maps & World Models
+
+## What You'll Learn
+
+For a team of robots to work effectively, they need a common understanding of their environment. This lesson delves into how multiple robots can collaboratively build, maintain, and utilize shared maps and more abstract "world models." You will explore techniques for map merging, consistent localization, and distributed state estimation.
+
+## 1. Why Shared Maps and World Models?
+
+Imagine a team of explorers charting an unknown territory. They would share their individual findings to build a comprehensive map much faster than any single explorer could. The same principle applies to multi-robot systems.
+
+### Benefits:
+
+-   **Enhanced Coverage:** Map larger areas much more quickly.
+-   **Improved Robustness:** If one robot's sensor data is temporarily ambiguous, another robot's data can help.
+-   **Consistent Localization:** All robots can localize themselves within a single, consistent global reference frame.
+-   **Coordinated Planning:** Enables global path planning and task allocation for the entire fleet.
+-   **Reduced Redundancy:** Avoids duplicate mapping efforts.
+
+## 2. Shared Maps: Geometric Understanding
+
+Shared maps primarily deal with the geometric representation of the environment.
+
+### a. Distributed Mapping
+
+-   **Concept:** Each robot performs SLAM independently in its local area, generating its own sub-map.
+-   **Challenge:** These sub-maps are often in different coordinate frames and need to be aligned.
+
+### b. Map Merging
+
+-   **Concept:** Algorithms for combining multiple sub-maps into a single, consistent global map.
+-   **Techniques:**
+    -   **Feature-Based Alignment:** Identify common features (landmarks, distinctive patterns) in overlapping sub-maps to calculate the transformation between them.
+    -   **Scan Matching:** Aligning raw sensor scans (e.g., LIDAR scans) from different robots.
+    -   **Graph-Based Optimization:** Formulating the map merging problem as an optimization problem where robot poses and map features are nodes in a graph, and sensor measurements are edges.
+
+### c. Consistent Localization in Shared Maps
+
+Once a shared map exists, each robot needs to localize itself within it.
+
+-   **Global Localization:** Using techniques like Monte Carlo Localization (MCL) (as discussed in Chapter 4), but now against a global, shared map.
+-   **Inter-robot Localization:** Robots can use each other as mobile beacons or landmarks to improve their localization estimates, especially in GPS-denied environments.
+
+## 3. World Models: Semantic Understanding
+
+Beyond just geometric maps, a **world model** includes semantic information and the state of dynamic objects and other agents.
+
+### a. Semantic Mapping
+
+-   **Concept:** Integrating semantic information (e.g., "this is a door," "that's a table," "this area is a 'kitchen'") into the geometric map.
+-   **Benefits:** Enables higher-level reasoning and task planning (e.g., "Go through the red door," "Find the objects on the table").
+
+### b. Distributed State Estimation
+
+-   **Concept:** Sharing sensor observations and state estimates (e.g., robot poses, object locations) among the fleet to improve the collective understanding of the dynamic environment.
+-   **Example:** If one robot detects an obstacle, it shares that information, and all other robots update their local costmaps.
+-   **Object Tracking:** Multiple robots can collaboratively track dynamic objects (e.g., moving humans, other robots), improving tracking robustness and accuracy.
+
+### c. Common Operating Picture (COP)
+
+-   **Concept:** A centralized or distributed representation of the environment and all agents' states, providing a shared understanding for all robots and human operators.
+
+## 4. ROS 2 for Multi-Robot Communication
+
+ROS 2 provides excellent features to facilitate multi-robot communication and shared understanding.
+
+### a. Namespacing
+
+-   **Concept:** Each robot in a multi-robot system typically operates within its own **namespace**. This prevents naming conflicts for topics, services, actions, and parameters.
+-   **Example:** `robot1/cmd_vel`, `robot2/cmd_vel` instead of just `/cmd_vel`.
+-   **Implementation:** Achieved by setting the `ROS_NAMESPACE` environment variable or using `remappings` in launch files.
+
+### b. Multi-Robot Launch Systems
+
+-   **Concept:** Tools and conventions for launching and managing an entire fleet of robots.
+-   **Example:** A master launch file that includes multiple sub-launch files, each for a specific robot, with appropriate namespaces.
+
+### c. DDS (Data Distribution Service)
+
+-   **Concept:** ROS 2's underlying communication layer. DDS is designed for high-performance, real-time, and robust data exchange in distributed systems.
+-   **Discovery:** DDS allows robots on the same network to automatically discover each other's ROS 2 topics and services.
+-   **Quality of Service (QoS):** ROS 2 allows you to configure QoS settings (e.g., reliability, history, deadline) for each communication channel, optimizing for different data types (e.g., reliable for commands, best-effort for sensor streams).
+
+## Hands-On: Conceptualizing Shared Mapping for Capstone
+
+Let's expand on our capstone scenario where multiple mobile manipulators clear objects from an area.
+
+### Step 1: Initial Mapping (Distributed)
+
+-   Each robot `robot_a` and `robot_b` independently performs SLAM (e.g., using `slam_toolbox`) in its assigned zone.
+-   They generate their own sub-maps (`robot_a/map`, `robot_b/map`) and localizes themselves within them.
+
+### Step 2: Map Merging (Conceptual)
+
+-   A dedicated "map server" node (or a distributed algorithm) collects the sub-maps from `robot_a` and `robot_b`.
+-   It uses a map-merging algorithm to align and fuse these sub-maps into a single `global_map`.
+-   This `global_map` is then published to all robots.
+
+### Step 3: Global Localization
+
+-   Each robot now localizes itself against the `global_map`.
+-   The localization data from each robot can be shared, allowing robots to "see" each other's positions on the global map.
+
+### Step 4: Shared Object Detections (World Model)
+
+-   If `robot_a` detects a "blue block," it publishes this detection to a `global/detected_objects` topic.
+-   `robot_b` subscribes to this topic and updates its own understanding of the environment, now knowing the location of objects found by `robot_a`.
+
+<Admonition type="tip" title="No Single Robot is an Island">
+  The power of multi-robot systems lies in their ability to combine their individual perceptions and actions into a collective intelligence.
+</Admonition>
+
+## Challenges
+
+1.  **Map Merging Algorithms:** Research different algorithms used for map merging in multi-robot SLAM. What are the difficulties (e.g., loop closures between different robots)?
+2.  **Multi-Robot Navigation:** How would multiple robots coordinate their paths to avoid collisions not just with static obstacles, but with each other? (Hint: Research "multi-robot path planning" or "traffic management" in robotics).
+3.  **Communication Failure:** What happens if the communication between robots is intermittent or completely lost? How can a multi-robot system be designed to be robust to such failures?

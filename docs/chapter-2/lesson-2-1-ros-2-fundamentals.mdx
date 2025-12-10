@@ -1,0 +1,146 @@
+---
+title: 2.1 - ROS 2 Fundamentals
+sidebar_position: 1
+id: lesson-2-1-ros-2-fundamentals
+---
+
+import Admonition from '@theme/Admonition';
+
+# 2.1 - ROS 2 Fundamentals
+
+## What You'll Learn
+
+This lesson introduces the core concepts and architecture of the Robot Operating System 2 (ROS 2). You will understand why ROS 2 is essential for modern robotics development and explore its fundamental communication mechanisms, forming the backbone of your Physical AI systems.
+
+## Why ROS 2?
+
+Robots are complex systems, often comprising dozens of sensors, actuators, and decision-making modules that all need to work together seamlessly. Without a standardized framework, developing and integrating these components becomes a nightmare.
+
+**ROS 2 provides:**
+
+-   **Standardized Communication:** A common way for different software components to talk to each other.
+-   **Modularity:** Enables breaking down complex robot behaviors into smaller, manageable, reusable pieces.
+-   **Ecosystem:** A vast collection of libraries, tools, and algorithms developed by a global community.
+-   **Platform Agnostic:** Runs on various operating systems (Linux, Windows, macOS) and hardware (microcontrollers, SBCs, high-end PCs).
+-   **Scalability:** Supports everything from small hobby robots to large industrial systems and multi-robot deployments.
+
+## Core ROS 2 Concepts
+
+ROS 2 is built around a distributed architecture. Each functional unit of a robot's software is a separate process (a "node"), communicating with others.
+
+### 1. Nodes: The Executables
+
+-   **Definition:** A node is an executable process that performs a specific task. For example, one node might read data from a camera, another might control a motor, and a third might calculate a navigation path.
+-   **Modularity:** Nodes keep code modular, making it easier to debug, reuse, and distribute.
+-   **Example:** `camera_publisher_node`, `motor_controller_node`, `path_planner_node`.
+
+### 2. Topics: Asynchronous Communication (Pub/Sub)
+
+-   **Definition:** Topics are named buses over which nodes exchange messages asynchronously. One node "publishes" messages to a topic, and other nodes "subscribe" to that topic to receive messages.
+-   **Real-time Streams:** Ideal for continuous data streams like sensor readings (e.g., camera images, LIDAR scans) or robot odometry.
+-   **Analogy:** Think of it like a radio station. The publisher broadcasts, and anyone tuned to that frequency receives the transmission.
+
+### 3. Services: Synchronous Communication (Request/Reply)
+
+-   **Definition:** Services provide a synchronous request/reply mechanism. A "client" node sends a request to a "server" node, and the server processes the request and sends back a response.
+-   **Blocking:** The client waits for the response before continuing.
+-   **Use Case:** Suitable for tasks that require an immediate answer, like querying a map, commanding a one-time action (e.g., "calibrate arm"), or requesting a calculation.
+
+### 4. Actions: Long-Running Tasks with Feedback
+
+-   **Definition:** Actions are similar to services but are designed for long-running tasks that provide periodic feedback and can be preempted. An "action client" sends a goal to an "action server," which provides continuous feedback on progress and a final result.
+-   **Use Case:** Ideal for navigation goals (e.g., "go to the kitchen"), complex manipulation sequences (e.g., "pick up the red block"), or other tasks that take time to complete.
+
+### 5. Parameters: Dynamic Configuration
+
+-   **Definition:** Parameters are values that nodes can store and retrieve at runtime. They allow for dynamic configuration of nodes without recompiling the code.
+-   **Use Case:** Adjusting a robot's maximum speed, changing a sensor's refresh rate, or setting a navigation threshold.
+
+### 6. Messages & Interfaces: The Data Structures
+
+-   **Definition:** Messages are the data structures used for communication over topics, services, and actions. Each message has a predefined structure (e.g., `Header`, `data`).
+-   **Interface Definition Language (IDL):** ROS 2 uses an IDL (similar to JSON or YAML) to define these message structures (`.msg` files for topics, `.srv` files for services, `.action` files for actions).
+
+### 7. The ROS Graph
+
+-   **Definition:** The ROS Graph is a network of all the ROS 2 nodes and their connections (topics, services, actions).
+-   **Visualization:** Tools like `rqt_graph` allow you to visualize this graph, helping you understand the data flow in your robot's software system.
+
+## Hands-On: Verify Your ROS 2 Installation
+
+Before we dive into writing code, let's confirm your ROS 2 environment is correctly set up and you can interact with its fundamental components using command-line tools.
+
+### Step 1: Source Your ROS 2 Environment
+
+Every time you open a new terminal, you must "source" your ROS 2 environment to make its commands available.
+
+```bash
+source /opt/ros/humble/setup.bash
+```
+<Admonition type="tip" title="Automatic Sourcing">
+  You can add this line to your `~/.bashrc` file (or `~/.zshrc` if you use Zsh) to have ROS 2 automatically sourced in every new terminal:
+  ```bash
+  echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ```
+</Admonition>
+
+### Step 2: Check ROS 2 Daemon
+
+The `ros2 daemon` is a background process that improves the performance of ROS 2 command-line tools.
+
+```bash
+ros2 daemon start # Starts the daemon if not running
+ros2 daemon status # Checks its status
+```
+
+### Step 3: List Running Nodes
+
+Let's see if any default ROS 2 nodes are running. (Initially, you might not see any unless you start a demo.)
+
+```bash
+ros2 node list
+```
+
+### Step 4: List Available Topics
+
+Topics are the most common communication mechanism.
+
+```bash
+ros2 topic list
+```
+
+### Step 5: Start a Simple ROS 2 Demo
+
+ROS 2 comes with simple "talker" (publisher) and "listener" (subscriber) nodes.
+
+Open two separate terminals (remember to source ROS 2 in each!).
+
+**Terminal 1 (Talker - Publisher):**
+```bash
+ros2 run demo_nodes_cpp talker
+```
+You should see messages indicating the talker is publishing.
+
+**Terminal 2 (Listener - Subscriber):**
+```bash
+ros2 run demo_nodes_py listener
+```
+You should see messages received from the talker.
+
+### Step 6: Explore the ROS Graph
+
+Open a third terminal and run `rqt_graph`. This graphical tool will show you how the `talker` and `listener` nodes are connected via a topic.
+
+```bash
+rqt_graph
+```
+<Admonition type="tip" title="Install rqt_graph">
+  If `rqt_graph` is not found, you might need to install it:
+  ```bash
+  sudo apt update
+  sudo apt install ros-humble-rqt-graph
+  ```
+</Admonition>
+
+Congratulations! You've successfully interacted with the core components of ROS 2. In the next lesson, we'll start building our own ROS 2 packages and nodes.

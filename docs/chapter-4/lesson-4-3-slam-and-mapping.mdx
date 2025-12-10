@@ -1,0 +1,142 @@
+---
+title: 4.3 - SLAM & Mapping
+sidebar_position: 3
+id: lesson-4-3-slam-and-mapping
+---
+
+import Admonition from '@theme/Admonition';
+
+# 4.3 - SLAM & Mapping
+
+## What You'll Learn
+
+For a robot to operate autonomously in an unknown environment, it needs to solve the "chicken-and-egg" problem of **Simultaneous Localization and Mapping (SLAM)**. This lesson will introduce you to the core concepts of SLAM, different types of maps, and popular algorithms that enable robots to build maps while simultaneously figuring out where they are within those maps.
+
+## 1. The SLAM Problem
+
+Imagine being dropped into a new building blindfolded. You need to draw a map, but you don't know where you are. As you move and take measurements, you gradually build the map, and by seeing where you are relative to what you've mapped, you figure out your position. This is the essence of SLAM.
+
+-   **Localization:** The process of determining the robot's pose (position and orientation) within a known map.
+-   **Mapping:** The process of building a map of the environment.
+
+SLAM is challenging because errors in localization lead to errors in mapping, and errors in mapping make localization harder. It's a tightly coupled problem.
+
+## 2. Types of Maps
+
+Robots represent their environment in various ways, depending on the sensors used and the task at hand.
+
+### a. Occupancy Grid Maps
+
+-   **Definition:** A 2D grid where each cell represents a small area of the environment. Each cell typically stores a probability of being occupied (an obstacle) or free.
+-   **Sensors:** Primarily built using 2D LIDAR scans.
+-   **Use Case:** Excellent for mobile robot navigation (path planning, obstacle avoidance) in planar environments.
+
+### b. Point Clouds
+
+-   **Definition:** A set of 3D data points representing the geometric shape of objects and surfaces in a 3D space. Each point has X, Y, Z coordinates and potentially color or intensity.
+-   **Sensors:** 3D LIDAR, RGB-D cameras (depth cameras).
+-   **Use Case:** Detailed 3D reconstruction, object segmentation, fine manipulation, visual navigation in complex environments.
+
+### c. Feature Maps
+
+-   **Definition:** Instead of a dense grid or cloud, feature maps represent the environment as a collection of salient landmarks or features (e.g., corners, lines, unique textures).
+-   **Sensors:** Often built using cameras (Visual SLAM).
+-   **Use Case:** Efficient for localization in environments with many distinct features.
+
+## 3. Localization Techniques
+
+Even with a perfect map, a robot needs to know where it is within that map.
+
+-   **Odometry (Dead Reckoning):**
+    -   **Concept:** Estimates the robot's pose by integrating motion sensor data (e.g., wheel encoders, IMUs).
+    -   **Problem:** Accumulates error over time (drift) because small measurement inaccuracies are compounded.
+-   **Global Localization:**
+    -   **Concept:** Given a known map, determines the robot's absolute pose within that map.
+    -   **Particle Filters (Monte Carlo Localization - MCL):** A probabilistic algorithm that tracks a set of "particles" (hypotheses about the robot's pose). As the robot moves and takes sensor readings, particles that don't match the observations are discarded, eventually converging on the true pose.
+
+## 4. Key SLAM Algorithms (Overview)
+
+Different algorithms are optimized for different sensors and environments.
+
+### a. LIDAR-based SLAM
+
+-   **Gmapping:** An older, but still widely used, 2D LIDAR-based SLAM algorithm for generating occupancy grid maps. Good for relatively flat, indoor environments.
+-   **Cartographer:** A more advanced 2D and 3D LIDAR-based SLAM algorithm developed by Google. Known for its accuracy and robustness in challenging environments.
+-   **Key Principle:** Uses scan matching (aligning successive LIDAR scans) to estimate motion and correct map errors.
+
+### b. Visual SLAM (vSLAM)
+
+-   **Concept:** Uses camera images (monocular, stereo, or RGB-D) to perform SLAM.
+-   **ORB-SLAM:** A highly popular and accurate monocular, stereo, and RGB-D SLAM system.
+-   **VINS-Mono (Visual-Inertial Navigation System):** Combines monocular camera data with IMU data for robust and drift-reduced SLAM.
+-   **Key Principle:** Detects and tracks visual features (like corners or distinctive textures) across image frames to estimate camera motion and build a sparse or dense map.
+
+## Hands-On: Building an Occupancy Grid Map with SLAM Toolbox
+
+We will use `slam_toolbox`, a state-of-the-art 2D SLAM system for ROS 2, to build a map in a simulated Gazebo environment.
+
+### Step 1: Install `slam_toolbox`
+
+```bash
+sudo apt update
+sudo apt install ros-humble-slam-toolbox
+```
+
+### Step 2: Launch a Simulated Robot with LIDAR in Gazebo
+
+For this example, we'll use a pre-built Gazebo world with a robot that has a 2D LIDAR. The `turtlebot3_gazebo` package provides such a robot.
+
+```bash
+sudo apt install ros-humble-turtlebot3-gazebo
+```
+In a new terminal (sourced for ROS 2):
+```bash
+ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+```
+This will launch Gazebo with a TurtleBot3 robot in a simulated environment.
+
+### Step 3: Launch `slam_toolbox`
+
+In another new terminal (sourced for ROS 2):
+```bash
+ros2 launch slam_toolbox online_async_launch.py
+```
+<Admonition type="tip" title="No Map Yet?">
+  You won't see a map yet. `slam_toolbox` needs data from the robot's LIDAR.
+</Admonition>
+
+### Step 4: Visualize in `rviz2`
+
+In a third new terminal (sourced for ROS 2):
+```bash
+rviz2
+```
+In `rviz2`:
+1.  Click `Add` in the bottom-left panel.
+2.  Select `By display type` > `Map`. Set `Topic` to `/map`.
+3.  Click `Add` again, select `By display type` > `LaserScan`. Set `Topic` to `/scan`.
+4.  Add a `TF` display to see the robot's coordinate frames.
+5.  Set the `Fixed Frame` (top-left) to `map`.
+
+### Step 5: Drive the Robot and Build the Map
+
+In the terminal where you launched `turtlebot3_world.launch.py`, open a new tab or terminal (sourced for ROS 2) and launch a teleoperation node:
+
+```bash
+ros2 run turtlebot3_teleop teleop_keyboard
+```
+Use the keyboard keys (`w`, `a`, `s`, `d`) to drive the robot around the Gazebo world. As the robot moves, `slam_toolbox` will process the LIDAR data, and you will see the map gradually forming in `rviz2`. The green path indicates the robot's estimated trajectory.
+
+### Step 6: Save the Map
+
+Once you're satisfied with the map:
+```bash
+ros2 run nav2_map_server map_saver_cli -f my_gazebo_map
+```
+This will save your generated map as `my_gazebo_map.yaml` and `my_gazebo_map.pgm` in your current directory.
+
+## Challenges
+
+1.  **Map Exploration:** Drive the robot through different areas of the Gazebo world. Observe how `slam_toolbox` handles loop closures (when the robot revisits an already mapped area).
+2.  **LIDAR Filtering:** Research how LIDAR data is often filtered (e.g., removing ground points, outlier removal) before being fed into SLAM algorithms. Why is this important?
+3.  **Visual SLAM:** Research one of the Visual SLAM algorithms mentioned (e.g., ORB-SLAM). How does it differ from LIDAR-based SLAM in terms of sensor input, output, and error characteristics?

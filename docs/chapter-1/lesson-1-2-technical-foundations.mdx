@@ -1,0 +1,61 @@
+---
+title: 1.2 - Technical Foundations
+sidebar_position: 2
+id: lesson-1-2-technical-foundations
+---
+
+# 1.2 - Technical Foundations
+
+## What You'll Learn
+
+This lesson outlines the core software stack and technical requirements for the course. A standardized development environment is crucial in robotics to ensure consistency and prevent compatibility issues. We will detail the specific versions of the operating system, middleware, and tools you need to install.
+
+## The Core Software Stack
+
+Our development will be based on a specific, industry-standard stack. While other options exist, adhering to this stack will guarantee that all code and examples in this textbook work as expected.
+
+### 1. Operating System: Ubuntu 22.04 LTS
+
+-   **What it is:** A specific version of the Linux operating system.
+-   **Why we use it:** Ubuntu is the most widely supported and used OS for robotics development, particularly with ROS. Version 22.04 is a Long-Term Support (LTS) release, which means it receives security and maintenance updates for five years, providing a stable foundation for our projects.
+
+### 2. Robotics Middleware: ROS 2 Humble Hawksbill
+
+-   **What it is:** The Robot Operating System (ROS) is a flexible framework for writing robot software. It is a collection of tools, libraries, and conventions that aim to simplify the task of creating complex and robust robot behavior across a wide variety of robotic platforms.
+-   **Why we use it:** ROS 2 provides a standardized communication layer, allowing different parts of a robot's software (e.g., perception, planning, control) to communicate with each other as a system of modular "nodes". The "Humble Hawksbill" release is the official LTS version that pairs with Ubuntu 22.04.
+
+### 3. Simulator: Gazebo (Ignition)
+
+-   **What it is:** Gazebo is a powerful 3D robotics simulator that allows for the accurate simulation of physics, sensors, and actuators.
+-   **Why we use it:** Before deploying code to expensive and potentially fragile hardware, we will test everything in simulation. Gazebo allows us to build and test our entire software stack in a virtual world that closely mimics reality. We will use the modern version of Gazebo, also known as Ignition Gazebo.
+
+### 4. Programming Languages: Python & C++
+
+-   **Python:** We will use Python for its rapid development speed, ease of use, and strong support in the AI/ML ecosystem. It's perfect for high-level scripting, UI elements, and non-performance-critical nodes.
+-   **C++:** For performance-critical processes like real-time control loops, perception pipelines, and complex algorithm implementation, C++ is the industry standard due to its speed and efficiency. You will see both languages used throughout this course.
+
+### 5. Version Control: Git & GitHub
+
+-   **What they are:** Git is a version control system for tracking changes in code. GitHub is a web platform for hosting and collaborating on Git repositories.
+-   **Why we use them:** All code for this textbook will be managed with Git and hosted on GitHub. Understanding how to use Git is a fundamental skill for any software or robotics engineer to manage code, track revisions, and collaborate with others.
+
+## Hardware Overview
+
+While the majority of this course will take place in simulation, the ultimate goal of Physical AI is to run on physical hardware. The principles you learn will be applicable to a wide range of devices, including:
+
+-   **Single-Board Computers (SBCs):** Like the Raspberry Pi 4/5 for running ROS nodes and high-level logic.
+-   **Embedded AI Computers:** Like the NVIDIA Jetson series for running GPU-accelerated perception and AI models.
+-   **Microcontrollers:** For low-level, real-time tasks like motor control and sensor reading.
+
+## Your Setup Task
+
+Before proceeding to the next chapter, your primary task is to **set up your development environment**. This involves:
+1.  Installing Ubuntu 22.04 on your computer or in a virtual machine.
+2.  Installing ROS 2 Humble Hawksbill.
+
+Detailed, official installation guides are the best source of information. Please follow the official documentation carefully:
+
+-   **[Official Ubuntu 22.04 Installation Guide](https://ubuntu.com/tutorials/install-ubuntu-desktop)**
+-   **[Official ROS 2 Humble Installation Guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)**
+
+Completing this setup is a critical step and a significant learning experience in itself. Do not proceed until you have a working ROS 2 installation on your machine.

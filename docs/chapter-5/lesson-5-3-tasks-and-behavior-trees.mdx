@@ -1,0 +1,121 @@
+---
+title: 5.3 - Tasks & Behavior Trees
+sidebar_position: 3
+id: lesson-5-3-tasks-and-behavior-trees
+---
+
+import Admonition from '@theme/Admonition';
+
+# 5.3 - Tasks & Behavior Trees
+
+## What You'll Learn
+
+Beyond simply navigating, autonomous robots need to manage and execute complex sequences of tasks, make decisions, and react to their environment. This lesson introduces **Behavior Trees (BTs)**, a powerful and increasingly popular tool for structuring robotic behaviors, allowing for modular, reactive, and easily understandable control logic.
+
+## 1. Task Planning: Beyond Simple Commands
+
+In previous lessons, we've focused on low-level control (e.g., move to a point, avoid obstacles). But how does a robot decide *what* to do and *when* to do it? This is the realm of **Task Planning**.
+
+-   **Goal:** Bridge the gap between high-level objectives (e.g., "fetch coffee") and low-level actions (e.g., "move forward 0.1m", "open gripper").
+-   **Challenges:**
+    -   **Sequencing:** Actions often need to happen in a specific order.
+    -   **Decision-Making:** The robot must choose between alternative actions based on sensor input.
+    -   **Reactivity:** The robot must respond to unexpected events (e.g., a new obstacle).
+    -   **Modularity:** Complex behaviors should be easy to build, reuse, and understand.
+
+## 2. Behavior Trees (BTs): A Powerful Framework
+
+Behavior Trees originated in the video game industry for controlling AI characters and have since been widely adopted in robotics due to their clear structure and reactive capabilities.
+
+### Core Concepts
+
+BTs are directed acyclic graphs (DAGs) composed of various types of nodes. Execution starts from the root node and flows downwards. Each node returns one of three states:
+
+-   **Success:** The task completed successfully.
+-   **Failure:** The task failed.
+-   **Running:** The task is still in progress.
+
+### Node Types
+
+BTs combine four fundamental types of nodes to create complex logic:
+
+1.  **Control Flow Nodes (Branching Logic):**
+    -   **Sequence (`->` or `[ ]`):** Executes children from left to right. Returns **Success** if *all* children succeed. Returns **Failure** if *any* child fails. If a child returns **Running**, the Sequence returns **Running** and ticks that child again next time.
+        -   *Analogy:* "Do A, then B, then C."
+    -   **Selector (`?` or `[ ]`):** Executes children from left to right. Returns **Success** if *any* child succeeds. Returns **Failure** if *all* children fail. If a child returns **Running**, the Selector returns **Running** and ticks that child again next time.
+        -   *Analogy:* "Try A, if it fails, try B, if that fails, try C." (First successful one wins).
+    -   **Parallel:** Executes all children simultaneously. Returns **Success** if `N` children succeed, and **Failure** if `M` children fail (where N and M are user-defined thresholds).
+
+2.  **Decorator Nodes (Modify Child Behavior):**
+    -   **Inverter (`!`)**: Inverts the return status of its child (Success becomes Failure, Failure becomes Success).
+    -   **Repeater:** Repeats its child's execution a certain number of times or indefinitely.
+    -   **ForceSuccess/ForceFailure:** Forces its child's return state.
+    -   **Timeout:** Returns Failure if its child takes too long.
+    -   *Analogy:* "Retry this 3 times," "If this fails, that's okay."
+
+3.  **Condition Nodes (Check Facts):**
+    -   **Definition:** Leaf nodes that check a condition in the environment or robot state. They return **Success** if the condition is true, and **Failure** if false. They never return **Running**.
+    -   *Example:* `IsObjectDetected?`, `IsBatteryLow?`, `IsPathClear?`.
+
+4.  **Action Nodes (Perform Actions):**
+    -   **Definition:** Leaf nodes that perform an atomic action on the robot or environment. They can return **Success**, **Failure**, or **Running**.
+    -   *Example:* `MoveToGoal`, `GraspObject`, `OpenGripper`, `SpeakMessage`.
+
+### Advantages of Behavior Trees
+
+-   **Modularity:** Easy to add, remove, or change behaviors without affecting others.
+-   **Reactivity:** Naturally handle interruptions and respond to dynamic changes in the environment (unlike traditional state machines).
+-   **Reusability:** Sub-trees can be reused across different behaviors.
+-   **Understandability:** The graphical representation makes BTs easy to read, visualize, and debug.
+
+## 3. Comparison with State Machines
+
+-   **State Machines (Finite State Automata):** Represent behavior as a set of discrete states and transitions between them.
+    -   **Pros:** Clear, well-defined states.
+    -   **Cons:** Can become complex and hard to manage for many states/transitions; poor reactivity to unexpected events (if not explicitly modeled); difficulty in reusability.
+-   **Behavior Trees:** Generally preferred for complex, reactive robotic systems.
+
+## Hands-On: Designing a Behavior Tree for Capstone Pick-and-Place
+
+For our capstone mobile manipulator, let's outline a high-level Behavior Tree for the pick-and-place task. We'll use a graphical representation.
+
+### Capstone Pick-and-Place Behavior Tree (High-Level)
+
+```
+[Sequence] Root (Execute the entire task)
+├── [Selector] Try to Pick Object (If one fails, try another way or report failure)
+│   ├── [Sequence] Approach and Grasp Known Object
+│   │   ├── [Condition] IsObjectDetected? (Checks if target object is visible)
+│   │   ├── [Action] MoveToObject (Navigate to object's location)
+│   │   ├── [Action] AlignWithObject (Orient manipulator)
+│   │   ├── [Action] GraspObject (Close gripper)
+│   │   └── [Condition] HasObjectBeenGrasped?
+│   └── [Action] SearchForObject (If object not detected, actively search)
+├── [Action] MoveToObjectPlacement (Navigate to target placement location)
+├── [Action] PlaceObject (Open gripper)
+└── [Condition] HasObjectBeenPlaced?
+```
+
+### Explanation:
+
+-   The `Root` is a **Sequence**: all steps must succeed in order.
+-   The `Try to Pick Object` is a **Selector**: it tries to approach and grasp, but if that fails, it tries to search. The first child that succeeds allows the selector to succeed.
+-   `IsObjectDetected?` and `HasObjectBeenGrasped?` are **Condition** nodes.
+-   `MoveToObject`, `AlignWithObject`, `GraspObject`, `SearchForObject`, `MoveToObjectPlacement`, `PlaceObject` are **Action** nodes.
+
+## ROS 2 Integration with Behavior Trees
+
+ROS 2's Nav2 stack (from Lesson 5.2) heavily utilizes Behavior Trees to orchestrate its navigation actions. The `BehaviorTree.CPP` library (a C++ implementation) and `py_trees` (a Python implementation) are popular choices for integrating BTs into ROS 2 applications.
+
+-   **Action Nodes as ROS 2 Actions/Services:** Each `Action` node in the BT typically maps to a ROS 2 Action (for long-running tasks like `MoveToGoal`) or a ROS 2 Service (for quick, one-shot commands like `OpenGripper`).
+-   **Condition Nodes as ROS 2 Service Calls/Topic Checks:** `Condition` nodes would often call a ROS 2 Service (e.g., from a perception node `IsObjectDetected?`) or check the state of a ROS 2 topic.
+
+<Admonition type="tip" title="Graphical Editors">
+  Many BT libraries come with graphical editors (e.g., `Groot` for `BehaviorTree.CPP`) that allow you to design and visualize your behavior trees interactively, which is invaluable for debugging and understanding complex robot logic.
+</Admonition>
+
+## Challenges
+
+1.  **Expand the "SearchForObject" Branch:** What might the internal structure of a `SearchForObject` action look like if it were also a Behavior Tree? (Hint: It might involve moving the robot's head/camera, scanning the environment, and repeatedly checking for the object).
+2.  **Add Error Handling:** Where in the example BT could you add decorator nodes (like a `Retry` decorator) or alternative branches (using a `Selector`) to handle common failures (e.g., `GraspObject` fails)?
+3.  **State Machines vs. Behavior Trees:** Research a common robotics task (e.g., a simple patrolling robot). Try to sketch out how you would implement its behavior using both a finite state machine and a Behavior Tree. Which approach seems more intuitive or robust for this task?
