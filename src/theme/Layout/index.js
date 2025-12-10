@@ -1,13 +1,14 @@
 import React from 'react';
 import Layout from '@theme-original/Layout';
-import FloatingChatbot from '@site/src/components/FloatingChatbot'; // Import the new component
+import ChatbotWidget from '../ChatbotWidget'; // Adjust path if needed
 
 export default function LayoutWrapper(props) {
   return (
     <>
-      <Layout {...props} />
-      {/* Render the new floating chatbot component */}
-      <FloatingChatbot />
+      <Layout {...props}>
+        {props.children}
+      </Layout>
+      <ChatbotWidget />
     </>
   );
 }
