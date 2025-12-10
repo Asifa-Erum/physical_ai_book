@@ -1,7 +1,13 @@
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './styles.module.css';
 
 const ChatbotWidget = () => {
+  const {
+    siteConfig: { customFields },
+  } = useDocusaurusContext();
+  const chatbotApiUrl = customFields.chatbotApiUrl;
+  
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -32,7 +38,7 @@ const ChatbotWidget = () => {
     setInput('');
 
     try {
-      const response = await fetch('https://rag-chatbot-eight-plum.vercel.app/api/v1/chat', {
+      const response = await fetch(chatbotApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
